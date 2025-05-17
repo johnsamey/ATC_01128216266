@@ -77,7 +77,7 @@ export class EventDetailsComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error('Error checking user booking:', error);
+        console.error('Error checking user booking: ', error);
       }
     });
   }

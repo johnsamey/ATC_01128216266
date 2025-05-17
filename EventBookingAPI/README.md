@@ -32,7 +32,7 @@ This project is the backend for the Event Booking System, built with .NET Core 8
    }
    ```
 
-4. If you are running the frontend and backend on different domains, you should handle CORS in `EventBooking.API/Program.cs`
+4. If you are running the frontend and backend on different domains, you should handle CORS in `EventBooking.API/Program.cs` and `EvenBooking.API/appsettings.json`
 
 5. Run database migrations:
    ```bash

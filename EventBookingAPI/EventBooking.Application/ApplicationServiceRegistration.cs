@@ -1,9 +1,11 @@
 ﻿using EventBooking.Application.Interfaces.Services;
 using EventBooking.Application.Interfaces.Services.Auth;
+using EventBooking.Application.Interfaces.Services.Bookings;
 using EventBooking.Application.Interfaces.Services.Categories;
 using EventBooking.Application.Interfaces.Services.Events;
 using EventBooking.Application.Interfaces.Services.Statistics;
 using EventBooking.Application.Interfaces.Services.UploadImg;
+using EventBooking.Application.Interfaces.Services.User;
 using EventBooking.Application.Services;
 using EventBooking.Application.Services.Auth;
 using EventBooking.Application.Services.Categories;

@@ -2,7 +2,7 @@ using EventBooking.Application.Common;
 using EventBooking.Application.DTOs.BookingDTOs;
 using EventBooking.Application.Helpers;
 
-namespace EventBooking.Application.Interfaces.Services;
+namespace EventBooking.Application.Interfaces.Services.Bookings;
 
 public interface IBookingService
 {

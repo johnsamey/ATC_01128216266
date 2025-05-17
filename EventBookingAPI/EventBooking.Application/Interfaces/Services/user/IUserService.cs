@@ -2,7 +2,7 @@ using System.Security.Claims;
 using EventBooking.Application.Common;
 using EventBooking.Application.DTOs.UserDTOs;
 
-namespace EventBooking.Application.Interfaces.Services;
+namespace EventBooking.Application.Interfaces.Services.User;
 
 public interface IUserService
 {

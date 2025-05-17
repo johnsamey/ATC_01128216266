@@ -7,6 +7,7 @@ using EventBooking.Application.Interfaces.Repositories.Booking;
 using EventBooking.Application.Interfaces.Repositories.Event;
 using EventBooking.Application.Interfaces.Services.Statistics;
 using EventBooking.Application.Interfaces.Services;
+using EventBooking.Application.Interfaces.Services.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace EventBooking.Application.Services.Statistics;

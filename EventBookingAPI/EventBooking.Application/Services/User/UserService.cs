@@ -3,6 +3,7 @@ using AutoMapper;
 using EventBooking.Application.Common;
 using EventBooking.Application.DTOs.UserDTOs;
 using EventBooking.Application.Interfaces.Services;
+using EventBooking.Application.Interfaces.Services.User;
 using EventBooking.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

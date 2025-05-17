@@ -5,6 +5,7 @@ using EventBooking.Application.Helpers;
 using EventBooking.Application.Interfaces.Repositories.Booking;
 using EventBooking.Application.Interfaces.Repositories.Event;
 using EventBooking.Application.Interfaces.Services;
+using EventBooking.Application.Interfaces.Services.Bookings;
 using EventBooking.Domain.Entities;
 
 namespace EventBooking.Application.Services;

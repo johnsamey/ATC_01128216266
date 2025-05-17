@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using EventBooking.Application.DTOs.BookingDTOs;
 using EventBooking.Application.Interfaces.Services;
+using EventBooking.Application.Interfaces.Services.Bookings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

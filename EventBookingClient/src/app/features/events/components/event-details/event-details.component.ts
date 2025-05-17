@@ -23,7 +23,7 @@ export class EventDetailsComponent implements OnInit {
   isBooking = false;
   bookingSuccess = false;
   bookingReference = '';
-  defaultImageUrl = 'assets/images/default-event.jpg';
+  defaultImageUrl = 'assets/uploads/default-event.jpg';
   isDarkMode = false;
   private isBrowser: boolean;
   userBooking: Booking | null = null;

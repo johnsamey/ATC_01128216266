@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+
+  frontend:
+    build:
+      context: ./event-booking-client
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80"
+    depends_on:
+      - web
+    restart: always
+    networks:
+      - clean_arch_network
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+    restart: always
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=EventBookingDB;Username=postgres;Password=;
+      - environment=Production
+      - CORS__AllowedOrigins=http://localhost:4200
+    networks:
+      - clean_arch_network
+
+  db:
+    image: postgres:latest
+    # container_name: sqlserver
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ChurchDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD:
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - clean_arch_network
+
+volumes:
+  postgres_data:
+
+networks:
+  clean_arch_network:
+    driver: bridge

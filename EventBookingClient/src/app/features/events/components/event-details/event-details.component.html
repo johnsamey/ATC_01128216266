@@ -1,0 +1,148 @@
+<app-toolbar [isDarkMode]="isDarkMode" (themeToggle)="toggleTheme()"></app-toolbar>
+
+<div class="event-details-container" [class.dark-theme]="isDarkMode">
+  <div class="event-content">
+    <!-- Loading State -->
+    <div *ngIf="!event && !bookingSuccess" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Loading event details...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!event && !bookingSuccess" class="error-container">
+      <div class="error-icon">⚠️</div>
+      <h2>Event Not Found</h2>
+      <p>The event you're looking for doesn't exist or has been removed.</p>
+      <button class="btn btn-primary" (click)="returnToEvents()">Return to Events</button>
+    </div>
+
+    <!-- Event Details -->
+    <div *ngIf="event && !bookingSuccess" class="event-details">
+      <div class="event-header">
+        <div class="event-title-section">
+          <h1 class="event-title">{{ event.title }}</h1>
+          <div class="event-meta">
+            <!-- <span class="event-category">{{ event.category }}</span> -->
+            <span class="event-date">{{ event.startDate | date:'mediumDate' }}</span>
+          </div>
+        </div>
+        <div class="event-price">
+          <span class="price-label">Price</span>
+          <span class="price-value">${{ event.price }}</span>
+        </div>
+      </div>
+
+      <div class="event-body">
+        <div class="event-image-container">
+          <img [src]="getEventImage(event.imageUrl)" [alt]="event.title" class="event-image">
+        </div>
+
+        <div class="event-info">
+          <div class="info-section">
+            <h3>Description</h3>
+            <p class="event-description">{{ event.description }}</p>
+          </div>
+
+          <div class="info-section">
+            <h3>Location</h3>
+            <div class="location-details">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>{{ event.venue }}</span>
+            </div>
+          </div>
+
+          <!-- <div class="info-section">
+            <h3>Organizer</h3>
+            <div class="organizer-details">
+              <i class="fas fa-user"></i>
+              <span>{{ event.organizer }}</span>
+            </div>
+          </div> -->
+
+          <!-- <div class="info-section">
+            <h3>Available Tickets</h3>
+            <div class="tickets-info">
+              <i class="fas fa-ticket-alt"></i>
+              <span>{{ event.availableTickets }} tickets remaining</span>
+            </div>
+          </div> -->
+        </div>
+      </div>
+
+      <div class="event-actions">
+        <!-- Not Authenticated -->
+        <button *ngIf="!isAuthenticated" 
+                class="btn btn-secondary" 
+                [routerLink]="['/auth']"
+                [queryParams]="{ returnUrl: '/events/' + event?.id }">
+          Login to Book
+        </button>
+
+        <!-- Authenticated but No Booking -->
+        <button *ngIf="isAuthenticated && !userBooking" 
+                class="btn btn-primary book-btn" 
+                [disabled]="isBooking"
+                (click)="bookEvent()">
+          <span *ngIf="!isBooking">Book Now</span>
+          <span *ngIf="isBooking">Processing...</span>
+        </button>
+
+        <!-- Has Pending Booking -->
+        <div *ngIf="isAuthenticated && userBooking?.status === 'Pending'" class="booking-status pending">
+          <p>Your booking is pending</p>
+          <button class="btn btn-primary" 
+                  [disabled]="isBooking"
+                  (click)="confirmBooking()">
+            <span *ngIf="!isBooking">Confirm Booking</span>
+            <span *ngIf="isBooking">Processing...</span>
+          </button>
+        </div>
+
+        <!-- Has Confirmed Booking -->
+        <div *ngIf="isAuthenticated && userBooking?.status === 'Confirmed'" class="booking-status confirmed">
+          <p>Booking Confirmed</p>
+          <button class="btn btn-secondary" routerLink="/profile/bookings">
+            View Booking
+          </button>
+        </div>
+
+        <!-- Has Cancelled Booking -->
+        <div *ngIf="isAuthenticated && userBooking?.status === 'Cancelled'" class="booking-status cancelled">
+          <p>Booking Cancelled</p>
+          <button class="btn btn-primary" 
+                  [disabled]="isBooking"
+                  (click)="bookEvent()">
+            Book Again
+        </button>
+        </div>
+
+        <button class="btn btn-outline" (click)="returnToEvents()">
+          Back to Events
+        </button>
+      </div>
+    </div>
+
+    <!-- Booking Success -->
+    <div *ngIf="bookingSuccess" class="booking-success">
+      <div class="success-icon">
+        <i class="fas fa-check"></i>
+      </div>
+      <h2>Booking Successful!</h2>
+      <div class="success-details">
+        <p>Your event has been successfully booked.</p>
+        <p>Booking Reference: <strong>{{ bookingReference }}</strong></p>
+        <p class="success-message">We've sent a confirmation email with all the details.</p>
+      </div>
+      <div class="success-actions">
+        <button class="btn btn-primary" (click)="viewBookings()">
+          <i class="fas fa-ticket-alt"></i>
+          View My Bookings
+        </button>
+        <button class="btn btn-outline" (click)="returnToEvents()">
+          <i class="fas fa-arrow-left"></i>
+          Return to Events
+        </button>
+      </div>
+    </div>
+  </div>
+</div> 

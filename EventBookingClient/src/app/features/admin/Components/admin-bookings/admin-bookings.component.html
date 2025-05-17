@@ -1,0 +1,132 @@
+<app-toolbar [isDarkMode]="isDarkMode" (themeToggle)="toggleTheme()"></app-toolbar>
+
+<!-- Confirmation Dialog -->
+<app-confirmation-dialog
+  [isOpen]="showConfirmDialog"
+  [title]="dialogTitle"
+  [message]="dialogMessage"
+  [confirmText]="dialogConfirmText"
+  [confirmButtonClass]="dialogConfirmClass"
+  [isDarkMode]="isDarkMode"
+  (confirm)="onConfirmAction()"
+  (cancel)="onCancelAction()">
+</app-confirmation-dialog>
+
+<!-- Cancel Dialog -->
+<app-confirmation-dialog
+  [isOpen]="showCancelDialog"
+  [title]="dialogTitle"
+  [message]="dialogMessage"
+  [confirmText]="dialogConfirmText"
+  [confirmButtonClass]="dialogConfirmClass"
+  [isDarkMode]="isDarkMode"
+  (confirm)="onConfirmAction()"
+  (cancel)="onCancelAction()">
+</app-confirmation-dialog>
+
+<div class="bookings-container" [class.dark-theme]="isDarkMode">
+  <div class="header">
+    <h1>Manage Bookings</h1>
+    <div class="filters">
+      <select [(ngModel)]="statusFilter" (change)="applyFilters()">
+        <option value="">All Statuses</option>
+        <option value="Pending">Pending</option>
+        <option value="Confirmed">Confirmed</option>
+        <option value="Cancelled">Cancelled</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Loading bookings...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage" class="error-container">
+    <div class="error-icon">⚠️</div>
+    <h2>Error</h2>
+    <p>{{ errorMessage }}</p>
+    <button class="btn btn-primary" (click)="loadBookings()">Try Again</button>
+  </div>
+
+  <!-- No Bookings State -->
+  <div *ngIf="!isLoading && !errorMessage && (!bookings || bookings.length === 0)" class="no-bookings">
+    <div class="empty-icon">📅</div>
+    <h2>No Bookings Found</h2>
+    <p>There are no bookings matching your criteria.</p>
+  </div>
+
+  <!-- Bookings Table -->
+  <div *ngIf="!isLoading && !errorMessage && bookings && bookings.length > 0" class="bookings-table">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Event</th>
+          <th>User</th>
+          <th>Date</th>
+          <th>Tickets</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let booking of bookings">
+          <td>{{ booking.id }}</td>
+          <td>
+            <span *ngIf="booking.event">{{ booking.event.title }}</span>
+            <span *ngIf="!booking.event" class="loading-text">Loading...</span>
+          </td>
+          <td>
+            <span *ngIf="booking.user">{{ booking.user.firstName }} {{ booking.user.lastName }}</span>
+            <span *ngIf="!booking.user" class="loading-text">Loading...</span>
+          </td>
+          <td>{{ booking.bookingDate | date:'mediumDate' }}</td>
+          <td>{{ booking.numberOfTickets }}</td>
+          <td>{{ booking.totalPrice.toFixed(2) }}</td>
+          <td>
+            <span class="status-badge" [class]="booking.status.toLowerCase()">
+              {{ booking.status }}
+            </span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button *ngIf="booking.status === 'Pending'"
+                      class="btn btn-success btn-sm"
+                      (click)="confirmBooking(booking.id)">
+                Confirm
+              </button>
+              <button *ngIf="booking.status !== 'Cancelled'"
+                      class="btn btn-danger btn-sm"
+                      (click)="cancelBooking(booking.id)">
+                Cancel
+              </button>
+              <button class="btn btn-primary btn-sm"
+                      (click)="viewBookingDetails(booking.id)">
+                View
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div *ngIf="totalPages > 1" class="pagination">
+      <button [disabled]="currentPage === 1" 
+              (click)="changePage(currentPage - 1)" 
+              class="btn btn-outline">
+        Previous
+      </button>
+      <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
+      <button [disabled]="currentPage === totalPages" 
+              (click)="changePage(currentPage + 1)" 
+              class="btn btn-outline">
+        Next
+      </button>
+    </div>
+  </div>
+</div> 

@@ -1,0 +1,147 @@
+<!-- event edit modal -->
+<div class="modal-overlay" *ngIf="isOpen" (click)="closeModal()">
+  <div class="modal-content" [class.dark-theme]="isDarkMode" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Edit Event</h2>
+      <button class="close-button" (click)="closeModal()">&times;</button>
+    </div>
+
+    <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" class="event-form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="title">Event Title</label>
+          <input
+            type="text"
+            id="title"
+            formControlName="title"
+            [class.error]="eventForm.get('title')?.invalid && eventForm.get('title')?.touched"
+          >
+          <div class="error-message" *ngIf="eventForm.get('title')?.invalid && eventForm.get('title')?.touched">
+            <span *ngIf="eventForm.get('title')?.errors?.['required']">Title is required</span>
+            <span *ngIf="eventForm.get('title')?.errors?.['minlength']">Title must be at least 3 characters</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Category</label>
+          <select
+            id="category"
+            formControlName="categoryId"
+            [class.error]="eventForm.get('categoryId')?.invalid && eventForm.get('categoryId')?.touched"
+          >
+            <option value="">Select a category</option>
+            <option *ngFor="let category of categories" [value]="category.id">
+              {{category.name}}
+            </option>
+          </select>
+          <div class="error-message" *ngIf="eventForm.get('categoryId')?.invalid && eventForm.get('categoryId')?.touched">
+            Please select a category
+          </div>
+        </div>
+      <div class="form-group full-width">
+        <label for="description">Description</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          rows="4"
+          [class.error]="eventForm.get('description')?.invalid && eventForm.get('description')?.touched"
+        ></textarea>
+        <div class="error-message" *ngIf="eventForm.get('description')?.invalid && eventForm.get('description')?.touched">
+          Description is required and must be at least 10 characters
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="startDate">Start Date & Time</label>
+        <input
+          type="datetime-local"
+          id="startDate"
+          formControlName="startDate"
+          [class.error]="eventForm.get('startDate')?.invalid && eventForm.get('startDate')?.touched"
+        >
+        <div class="error-message" *ngIf="eventForm.get('startDate')?.invalid && eventForm.get('startDate')?.touched">
+          Start date and time is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="endDate">End Date & Time</label>
+        <input
+          type="datetime-local"
+          id="endDate"
+          formControlName="endDate"
+          [class.error]="eventForm.get('endDate')?.invalid && eventForm.get('endDate')?.touched"
+        >
+        <div class="error-message" *ngIf="eventForm.get('endDate')?.invalid && eventForm.get('endDate')?.touched">
+          End date and time is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="venue">Venue</label>
+        <input
+          type="text"
+          id="venue"
+          formControlName="venue"
+          [class.error]="eventForm.get('venue')?.invalid && eventForm.get('venue')?.touched"
+        >
+        <div class="error-message" *ngIf="eventForm.get('venue')?.invalid && eventForm.get('venue')?.touched">
+          Venue is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="price">Price</label>
+        <input
+          type="number"
+          id="price"
+          formControlName="price"
+          min="0"
+          step="0.01"
+          [class.error]="eventForm.get('price')?.invalid && eventForm.get('price')?.touched"
+        >
+        <div class="error-message" *ngIf="eventForm.get('price')?.invalid && eventForm.get('price')?.touched">
+          Price must be a positive number
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label>Event Image</label>
+        <div class="image-upload" (click)="fileInput.click()">
+          <input
+            #fileInput
+            type="file"
+            accept="image/*"
+            (change)="onImageSelect($event)"
+            style="display: none"
+          >
+          <div class="upload-content" *ngIf="!imagePreview">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>Click to upload image</span>
+            <small>Max size: 5MB</small>
+          </div>
+          <div class="image-preview" *ngIf="imagePreview">
+            <img [src]="imagePreview" alt="Event preview">
+            <button type="button" class="remove-image" (click)="removeImage(); $event.stopPropagation()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+      <div class="error-message" *ngIf="error">
+        {{ error }}
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()" [disabled]="isLoading">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="eventForm.invalid || isLoading">
+          <span *ngIf="isLoading">Updating...</span>
+          <span *ngIf="!isLoading">Update Event</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div> 

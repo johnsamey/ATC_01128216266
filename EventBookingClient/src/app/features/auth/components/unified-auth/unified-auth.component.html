@@ -1,0 +1,158 @@
+<app-toolbar [isDarkMode]="isDarkMode" (themeToggle)="toggleTheme()"></app-toolbar>
+
+<div class="auth-container" [class.dark-theme]="isDarkMode">
+  <div class="auth-card" [@slideAnimation]="isLoginView ? 0 : 1">
+    <div class="auth-header">
+      <h2>{{ isLoginView ? 'Welcome Back' : 'Create Account' }}</h2>
+      <p>{{ isLoginView ? 'Sign in to continue' : 'Join us today' }}</p>
+    </div>
+
+    <!-- Login Form -->
+    <form *ngIf="isLoginView" [formGroup]="loginForm" (ngSubmit)="onLogin()" class="auth-form">
+      <div class="form-group">
+        <label for="login-username">Username</label>
+        <input 
+          type="text" 
+          id="login-username" 
+          formControlName="userName" 
+          placeholder="Enter your username"
+          [class.error]="loginForm.get('userName')?.invalid && loginForm.get('userName')?.touched"
+        >
+        <div class="error-message" *ngIf="loginForm.get('userName')?.invalid && loginForm.get('userName')?.touched">
+          Username is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <div class="password-input-container">
+        <input 
+            [type]="showLoginPassword ? 'text' : 'password'" 
+          id="login-password" 
+          formControlName="password" 
+          placeholder="Enter your password"
+          [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+        >
+          <button 
+            type="button" 
+            class="password-toggle" 
+            (click)="toggleLoginPasswordVisibility()"
+            [attr.aria-label]="showLoginPassword ? 'Hide password' : 'Show password'"
+          >
+            <i class="fas" [class.fa-eye]="!showLoginPassword" [class.fa-eye-slash]="showLoginPassword"></i>
+          </button>
+        </div>
+        <div class="error-message" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+          Password must be at least 6 characters
+        </div>
+      </div>
+
+      <button type="submit" class="submit-button" [disabled]="loginForm.invalid || isLoading">
+        <span *ngIf="!isLoading">Sign In</span>
+        <span *ngIf="isLoading" class="loading-spinner"></span>
+      </button>
+
+      <div class="form-footer">
+        <p>Don't have an account? <a (click)="toggleView()" class="toggle-link">Create Account</a></p>
+      </div>
+    </form>
+
+    <!-- Register Form -->
+    <form *ngIf="!isLoginView" [formGroup]="registerForm" (ngSubmit)="onRegister()" class="auth-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="register-firstname">First Name</label>
+          <input 
+            type="text" 
+            id="register-firstname" 
+            formControlName="firstName" 
+            placeholder="Enter first name"
+            [class.error]="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched"
+          >
+          <div class="error-message" *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched">
+            First name is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="register-lastname">Last Name</label>
+          <input 
+            type="text" 
+            id="register-lastname" 
+            formControlName="lastName" 
+            placeholder="Enter last name"
+            [class.error]="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched"
+          >
+          <div class="error-message" *ngIf="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched">
+            Last name is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="register-email">Email</label>
+        <input 
+          type="email" 
+          id="register-email" 
+          formControlName="email" 
+          placeholder="Enter your email"
+          [class.error]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+        >
+        <div class="error-message" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+          Please enter a valid email address
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="register-username">Username</label>
+        <input 
+          type="text" 
+          id="register-username" 
+          formControlName="userName" 
+          placeholder="Choose a username"
+          [class.error]="registerForm.get('userName')?.invalid && registerForm.get('userName')?.touched"
+        >
+        <div class="error-message" *ngIf="registerForm.get('userName')?.invalid && registerForm.get('userName')?.touched">
+          <span *ngIf="registerForm.get('userName')?.errors?.['required']">Username is required</span>
+          <span *ngIf="registerForm.get('userName')?.errors?.['usernameExists']">This username is already taken</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="register-password">Password</label>
+        <div class="password-input-container">
+        <input 
+            [type]="showRegisterPassword ? 'text' : 'password'" 
+          id="register-password" 
+          formControlName="password" 
+          placeholder="Create a password"
+          [class.error]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+        >
+          <button 
+            type="button" 
+            class="password-toggle" 
+            (click)="toggleRegisterPasswordVisibility()"
+            [attr.aria-label]="showRegisterPassword ? 'Hide password' : 'Show password'"
+          >
+            <i class="fas" [class.fa-eye]="!showRegisterPassword" [class.fa-eye-slash]="showRegisterPassword"></i>
+          </button>
+        </div>
+        <div class="error-message" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+          Password must be at least 6 characters
+        </div>
+      </div>
+
+      <button type="submit" class="submit-button" [disabled]="registerForm.invalid || isLoading">
+        <span *ngIf="!isLoading">Create Account</span>
+        <span *ngIf="isLoading" class="loading-spinner"></span>
+      </button>
+
+      <div class="form-footer">
+        <p>Already have an account? <a (click)="toggleView()" class="toggle-link">Sign In</a></p>
+      </div>
+    </form>
+
+    <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
+    <div class="success-message" *ngIf="successMessage">{{ successMessage }}</div>
+  </div>
+</div> 

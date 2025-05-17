@@ -1,0 +1,14 @@
+<div class="dialog-overlay" *ngIf="isOpen" (click)="onOverlayClick($event)" [@fadeInOut]>
+  <div class="dialog-content" [class.dark-theme]="isDarkMode" [@slideInOut]>
+    <h2>{{ title }}</h2>
+    <p>{{ message }}</p>
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" (click)="onCancel()">
+        {{ cancelText }}
+      </button>
+      <button class="btn" [class]="confirmButtonClass" (click)="onConfirm()">
+        {{ confirmText }}
+      </button>
+    </div>
+  </div>
+</div> 

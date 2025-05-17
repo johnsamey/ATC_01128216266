@@ -1,0 +1,59 @@
+<div class="toolbar" [class.dark-theme]="isDarkMode">
+  <div class="toolbar-content">
+    <div class="toolbar-left">
+      <a routerLink="/" class="logo">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Event Booking</span>
+      </a>
+      <div class="nav-links">
+        <a routerLink="/events" class="nav-link" routerLinkActive="active">
+          <i class="fas fa-calendar-day"></i>
+          <span>Events</span>
+        </a>
+      </div>
+      <ng-content select="[toolbarLeft]"></ng-content>
+    </div>
+    <div class="toolbar-right">
+      <ng-container *ngIf="isAuthenticated; else unauthenticated">
+        <div class="user-menu" (click)="toggleUserMenu()" #userMenuTrigger>
+          <div class="user-info">
+            <i class="fas fa-user-circle"></i>
+            <span class="username" *ngIf="!isLoading">{{ userName }}</span>
+            <span class="username loading" *ngIf="isLoading">
+              <i class="fas fa-spinner fa-spin"></i>
+            </span>
+          </div>
+          <div class="user-dropdown" [class.show]="showUserMenu">
+            <a *ngIf="isAdmin" routerLink="/admin" class="dropdown-item">
+              <i class="fas fa-tachometer-alt"></i>
+              <span>Admin Dashboard</span>
+            </a>
+            <a routerLink="/profile" class="dropdown-item">
+              <i class="fas fa-user"></i>
+              <span>Profile</span>
+            </a>
+            <a routerLink="/profile/bookings" class="dropdown-item">
+              <i class="fas fa-calendar-check"></i>
+              <span>My Bookings</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item" (click)="handleLogout()">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #unauthenticated>
+        <a routerLink="/auth" class="auth-button">
+          <i class="fas fa-sign-in-alt"></i>
+          <span>Login/Register</span>
+        </a>
+      </ng-template>
+      <button class="theme-button" (click)="toggleTheme()" [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+        <i class="fas" [class.fa-sun]="!isDarkMode" [class.fa-moon]="isDarkMode"></i>
+      </button>
+      <ng-content select="[toolbarRight]"></ng-content>
+    </div>
+  </div>
+</div> 

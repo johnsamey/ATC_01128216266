@@ -1,0 +1,99 @@
+:root {
+  --primary-color: #4a90e2;
+  --primary-hover: #357abd;
+  --error-color: #e74c3c;
+  --text-color: #333;
+  --text-light: #666;
+  --background-color: #f5f6fa;
+  --card-background: #ffffff;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+.dark-theme {
+  --primary-color: #64b5f6;
+  --primary-hover: #42a5f5;
+  --error-color: #ff6b6b;
+  --text-color: #e0e0e0;
+  --text-light: #b0b0b0;
+  --background-color: #121212;
+  --card-background: #1e1e1e;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+.error-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--background-color);
+  padding: 2rem;
+  transition: background-color 0.3s ease;
+}
+
+.error-content {
+  background-color: var(--card-background);
+  padding: 3rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px var(--shadow-color);
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.error-title {
+  color: var(--error-color);
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.error-message {
+  color: var(--text-light);
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.error-button {
+  display: inline-block;
+  padding: 0.875rem 2rem;
+  background-color: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.error-button:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+/* Specific styles for unauthorized page */
+.unauthorized .error-title {
+  color: var(--error-color);
+}
+
+/* Specific styles for not found page */
+.not-found .error-title {
+  color: var(--error-color);
+}
+
+/* Animation for error content */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-content {
+  animation: fadeIn 0.5s ease-out;
+} 

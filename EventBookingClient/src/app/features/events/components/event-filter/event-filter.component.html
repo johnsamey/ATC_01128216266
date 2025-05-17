@@ -1,0 +1,21 @@
+<div class="filter-container">
+  <div *ngIf="loading" class="loading-spinner"></div>
+  
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+    <button (click)="loadCategories()" class="retry-button">Retry</button>
+  </div>
+
+  <select 
+    *ngIf="!loading && !error"
+    [(ngModel)]="selectedCategoryId"
+    (change)="onCategorySelect(selectedCategoryId)"
+    class="category-select"
+    [disabled]="loading"
+  >
+    <option [ngValue]="undefined">All Categories</option>
+    <option *ngFor="let category of categories" [value]="category.id">
+      {{ category.name }}
+    </option>
+  </select>
+</div> 

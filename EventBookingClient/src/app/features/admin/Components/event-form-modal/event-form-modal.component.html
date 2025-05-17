@@ -1,0 +1,163 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="closeModal()">
+  <div class="modal-content" [class.dark-theme]="isDarkMode" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Create New Event</h2>
+      <button class="close-button" (click)="closeModal()">×</button>
+    </div>
+
+    <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" class="event-form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="title">Event Title</label>
+          <input
+            type="text"
+            id="title"
+            formControlName="title"
+            placeholder="Enter event title"
+            [class.error]="eventForm.get('title')?.invalid && eventForm.get('title')?.touched"
+          >
+          <div class="error-message" *ngIf="eventForm.get('title')?.invalid && eventForm.get('title')?.touched">
+            <span *ngIf="eventForm.get('title')?.errors?.['required']">Title is required</span>
+            <span *ngIf="eventForm.get('title')?.errors?.['minlength']">Title must be at least 3 characters</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Category</label>
+          <select
+            id="category"
+            formControlName="categoryId"
+            [class.error]="eventForm.get('categoryId')?.invalid && eventForm.get('categoryId')?.touched"
+          >
+            <option value="">Select a category</option>
+            <option *ngFor="let category of categories" [value]="category.id">
+              {{category.name}}
+            </option>
+          </select>
+          <div class="error-message" *ngIf="eventForm.get('categoryId')?.invalid && eventForm.get('categoryId')?.touched">
+            Please select a category
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            rows="4"
+            placeholder="Enter event description"
+            [class.error]="eventForm.get('description')?.invalid && eventForm.get('description')?.touched"
+          ></textarea>
+          <div class="error-message" *ngIf="eventForm.get('description')?.invalid && eventForm.get('description')?.touched">
+            <span *ngIf="eventForm.get('description')?.errors?.['required']">Description is required</span>
+            <span *ngIf="eventForm.get('description')?.errors?.['minlength']">Description must be at least 10 characters</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="startDate">Start Date & Time</label>
+          <input
+            type="datetime-local"
+            id="startDate"
+            formControlName="startDate"
+            [class.error]="eventForm.get('startDate')?.invalid && eventForm.get('startDate')?.touched"
+          >
+          <div class="error-message" *ngIf="eventForm.get('startDate')?.invalid && eventForm.get('startDate')?.touched">
+            Start date is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="endDate">End Date & Time</label>
+          <input
+            type="datetime-local"
+            id="endDate"
+            formControlName="endDate"
+            [class.error]="eventForm.get('endDate')?.invalid && eventForm.get('endDate')?.touched"
+          >
+          <div class="error-message" *ngIf="eventForm.get('endDate')?.invalid && eventForm.get('endDate')?.touched">
+            End date is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="venue">Venue</label>
+          <input
+            type="text"
+            id="venue"
+            formControlName="venue"
+            placeholder="Enter event venue"
+            [class.error]="eventForm.get('venue')?.invalid && eventForm.get('venue')?.touched"
+          >
+          <div class="error-message" *ngIf="eventForm.get('venue')?.invalid && eventForm.get('venue')?.touched">
+            Venue is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="price">Price ($)</label>
+          <input
+            type="number"
+            id="price"
+            formControlName="price"
+            placeholder="Enter ticket price"
+            min="0"
+            max="10000"
+            [class.error]="eventForm.get('price')?.invalid && eventForm.get('price')?.touched"
+          >
+          <div class="error-message" *ngIf="eventForm.get('price')?.invalid && eventForm.get('price')?.touched">
+            <span *ngIf="eventForm.get('price')?.errors?.['required']">Price is required</span>
+            <span *ngIf="eventForm.get('price')?.errors?.['min']">Price must be at least $0</span>
+            <span *ngIf="eventForm.get('price')?.errors?.['max']">Price cannot exceed $10,000</span>
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="image">Event Image</label>
+          <div class="image-upload" [class.has-image]="imagePreview" [class.has-error]="imageError">
+            <input
+              type="file"
+              id="image"
+              accept="image/jpeg,image/png,image/webp"
+              (change)="onImageSelect($event)"
+            >
+            <div class="upload-placeholder" *ngIf="!imagePreview">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <span>Click to upload image</span>
+              <small>Supported formats: JPEG, PNG, WebP (max 5MB)</small>
+            </div>
+            <div class="image-preview" *ngIf="imagePreview">
+              <img [src]="imagePreview" alt="Event preview">
+              <div class="image-overlay">
+                <button type="button" class="remove-image" (click)="removeImage()">
+                  <i class="fas fa-times"></i>
+                </button>
+                <div class="image-info">
+                  <span class="file-name">{{ selectedImage?.name }}</span>
+                  <span class="file-size">{{ selectedImage?.size | fileSize }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="error-message" *ngIf="imageError">
+              {{ imageError }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()" [disabled]="isLoading">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="eventForm.invalid || isLoading">
+          <span *ngIf="isLoading">Creating...</span>
+          <span *ngIf="!isLoading">Create Event</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div> 

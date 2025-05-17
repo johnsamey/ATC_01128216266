@@ -1,0 +1,342 @@
+<app-toolbar [isDarkMode]="isDarkMode" (themeToggle)="toggleTheme()"></app-toolbar>
+
+<div class="profile-page" [class.dark-theme]="isDarkMode">
+  <div class="profile-container">
+    <!-- Profile Header with User Info -->
+    <div class="profile-header">
+      <div class="user-info">
+        <div class="avatar">
+          <span class="avatar-initial">{{ user?.firstName?.charAt(0) || user?.userName?.charAt(0) || 'U' }}</span>
+        </div>
+        <div class="user-details">
+          <h1>{{ user?.firstName }} {{ user?.lastName }}</h1>
+          <p class="username">{{ user?.userName }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-navigation">
+      <button 
+        *ngFor="let tab of tabs" 
+        class="tab-button" 
+        [class.active]="activeTab === tab.id"
+        (click)="activeTab = tab.id">
+        <i [class]="tab.icon"></i>
+        <span>{{ tab.label }}</span>
+      </button>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+      <!-- Personal Information Tab -->
+      <div class="tab-pane" *ngIf="activeTab === 'personal'">
+        <div class="section-card">
+          <div class="section-header">
+            <h2>Personal Information</h2>
+            <p class="section-description">Update your personal details and contact information</p>
+          </div>
+
+          <div *ngIf="!isEditing" class="info-display">
+            <div class="info-grid">
+              <div class="info-group">
+                <label>First Name</label>
+                <p>{{ user?.firstName || 'Not set' }}</p>
+              </div>
+              <div class="info-group">
+                <label>Last Name</label>
+                <p>{{ user?.lastName || 'Not set' }}</p>
+              </div>
+            </div>
+            <div class="info-grid">
+              <div class="info-group">
+                <label>Username</label>
+                <p>{{ user?.userName }}</p>
+              </div>
+              <div class="info-group">
+                <label>Email</label>
+                <p>{{ user?.email }}</p>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" (click)="startEditing()">
+                <i class="fas fa-edit"></i> Edit Profile
+              </button>
+            </div>
+          </div>
+
+          <form *ngIf="isEditing" [formGroup]="profileForm" (ngSubmit)="updateProfile()" class="edit-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input
+                  type="text"
+                  id="firstName"
+                  formControlName="firstName"
+                  [class.is-invalid]="isFieldInvalid('firstName')"
+                  placeholder="Enter your first name"
+                >
+                <div class="error-message" *ngIf="isFieldInvalid('firstName')">
+                  {{ getErrorMessage('firstName') }}
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input
+                  type="text"
+                  id="lastName"
+                  formControlName="lastName"
+                  [class.is-invalid]="isFieldInvalid('lastName')"
+                  placeholder="Enter your last name"
+                >
+                <div class="error-message" *ngIf="isFieldInvalid('lastName')">
+                  {{ getErrorMessage('lastName') }}
+                </div>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="username">Username</label>
+                <input
+                  type="text"
+                  id="username"
+                  formControlName="username"
+                  [class.is-invalid]="isFieldInvalid('username')"
+                  placeholder="Enter your username"
+                >
+                <div class="error-message" *ngIf="isFieldInvalid('username')">
+                  {{ getErrorMessage('userName') }}
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  formControlName="email"
+                  [class.is-invalid]="isFieldInvalid('email')"
+                  placeholder="Enter your email"
+                >
+                <div class="error-message" *ngIf="isFieldInvalid('email')">
+                  {{ getErrorMessage('email') }}
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" (click)="cancelEditing()">
+                <i class="fas fa-times"></i> Cancel
+              </button>
+              <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || isLoading">
+                <i class="fas fa-save"></i> {{ isLoading ? 'Saving...' : 'Save Changes' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Security Tab -->
+      <div class="tab-pane" *ngIf="activeTab === 'security'">
+        <div class="section-card">
+          <div class="section-header">
+            <h2>Security Settings</h2>
+            <p class="section-description">Manage your password and security preferences</p>
+          </div>
+
+          <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="password-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="currentPassword">Current Password</label>
+                <div class="password-input-container">
+                  <input
+                    [type]="showCurrentPassword ? 'text' : 'password'"
+                    id="currentPassword"
+                    formControlName="currentPassword"
+                    [class.is-invalid]="isFieldInvalid('currentPassword')"
+                    placeholder="Enter your current password"
+                  >
+                  <button type="button" class="toggle-password" (click)="togglePasswordVisibility('current')">
+                    <i [class]="showCurrentPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                  </button>
+                </div>
+                <div class="error-message" *ngIf="isFieldInvalid('currentPassword')">
+                  {{ getErrorMessage('currentPassword') }}
+                </div>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="newPassword">New Password</label>
+                <div class="password-input-container">
+                  <input
+                    [type]="showNewPassword ? 'text' : 'password'"
+                    id="newPassword"
+                    formControlName="newPassword"
+                    [class.is-invalid]="isFieldInvalid('newPassword')"
+                    placeholder="Enter new password"
+                  >
+                  <button type="button" class="toggle-password" (click)="togglePasswordVisibility('new')">
+                    <i [class]="showNewPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                  </button>
+                </div>
+                <div class="error-message" *ngIf="isFieldInvalid('newPassword')">
+                  {{ getErrorMessage('newPassword') }}
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="confirmPassword">Confirm New Password</label>
+                <div class="password-input-container">
+                  <input
+                    [type]="showConfirmPassword ? 'text' : 'password'"
+                    id="confirmPassword"
+                    formControlName="confirmPassword"
+                    [class.is-invalid]="isFieldInvalid('confirmPassword')"
+                    placeholder="Confirm new password"
+                  >
+                  <button type="button" class="toggle-password" (click)="togglePasswordVisibility('confirm')">
+                    <i [class]="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                  </button>
+                </div>
+                <div class="error-message" *ngIf="isFieldInvalid('confirmPassword')">
+                  {{ getErrorMessage('confirmPassword') }}
+                </div>
+              </div>
+            </div>
+
+            <div class="password-requirements">
+              <h3>Password Requirements:</h3>
+              <ul>
+                <li>Minimum 6 characters</li>
+                <li>At least one uppercase letter</li>
+                <li>At least one lowercase letter</li>
+                <li>At least one number</li>
+                <li>At least one special character</li>
+              </ul>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" [disabled]="passwordForm.invalid || isLoading">
+                <i class="fas fa-key"></i> {{ isLoading ? 'Changing Password...' : 'Change Password' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Events Tab -->
+      <div class="tab-pane" *ngIf="activeTab === 'events'">
+        <div class="section-card">
+          <div class="section-header">
+            <h2>Event History</h2>
+            <p class="section-description">View your past and upcoming events</p>
+          </div>
+
+          <div class="events-container">
+            <div class="events-filter">
+              <button 
+                *ngFor="let filter of eventFilters" 
+                class="filter-button"
+                [class.active]="activeEventFilter === filter.id"
+                (click)="activeEventFilter = filter.id">
+                <i [class]="filter.icon"></i>
+                {{ filter.label }}
+              </button>
+            </div>
+
+            <div class="events-list" *ngIf="events.length > 0">
+              <div class="event-card" *ngFor="let event of events">
+                <div class="event-date">
+                  <span class="month">{{ event.date | date:'MMM' }}</span>
+                  <span class="day">{{ event.date | date:'d' }}</span>
+                </div>
+                <div class="event-details">
+                  <h3>{{ event.title }}</h3>
+                  <p class="event-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    {{ event.location }}
+                  </p>
+                  <p class="event-time">
+                    <i class="fas fa-clock"></i>
+                    {{ event.date | date:'shortTime' }}
+                  </p>
+                  <div class="event-status" [class]="event.status">
+                    {{ event.status }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="no-events" *ngIf="events.length === 0">
+              <i class="fas fa-calendar-times"></i>
+              <p>No events found</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Tab -->
+      <div class="tab-pane" *ngIf="activeTab === 'account'">
+        <div class="section-card danger-zone">
+          <div class="section-header">
+            <h2>Account Management</h2>
+            <p class="section-description">Manage your account settings and preferences</p>
+          </div>
+
+          <div class="danger-content">
+            <div class="warning-box">
+              <i class="fas fa-exclamation-triangle"></i>
+              <p class="warning-text">Once you delete your account, there is no going back. Please be certain.</p>
+            </div>
+            <button class="btn btn-danger" (click)="confirmDelete()">
+              <i class="fas fa-trash-alt"></i> Delete Account
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal" *ngIf="showDeleteModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <i class="fas fa-exclamation-circle"></i>
+      <h3>Delete Account</h3>
+    </div>
+    <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" (click)="cancelDelete()">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+      <button class="btn btn-danger" (click)="deleteAccount()" [disabled]="isLoading">
+        <i class="fas fa-trash-alt"></i> {{ isLoading ? 'Deleting...' : 'Delete Account' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Password Change Success Modal -->
+<div *ngIf="showPasswordSuccess" class="password-success-window" [class.dark-theme]="isDarkMode">
+  <div class="password-success">
+    <div class="success-icon">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    <h2>Password Changed Successfully!</h2>
+    <div class="success-details">
+      <p>Your password has been updated successfully.</p>
+      <p class="success-message">Please use your new password the next time you log in.</p>
+    </div>
+    <div class="success-actions">
+      <button class="btn btn-primary" (click)="closePasswordSuccess()">
+        <i class="fas fa-check"></i>
+        Got it
+      </button>
+    </div>
+  </div>
+</div>

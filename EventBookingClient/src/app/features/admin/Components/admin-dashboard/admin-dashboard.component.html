@@ -1,0 +1,205 @@
+<app-confirmation-dialog
+  [isOpen]="showConfirmDialog"
+  [title]="dialogTitle"
+  [message]="dialogMessage"
+  [confirmText]="dialogConfirmText"
+  [confirmButtonClass]="dialogConfirmClass"
+  [isDarkMode]="isDarkMode"
+  (confirm)="onConfirmAction()"
+  (cancel)="onCancelAction()">
+</app-confirmation-dialog>
+
+<!-- Cancel Dialog -->
+<app-confirmation-dialog
+  [isOpen]="showCancelDialog"
+  [title]="dialogTitle"
+  [message]="dialogMessage"
+  [confirmText]="dialogConfirmText"
+  [confirmButtonClass]="dialogConfirmClass"
+  [isDarkMode]="isDarkMode"
+  (confirm)="onConfirmAction()"
+  (cancel)="onCancelAction()">
+</app-confirmation-dialog>
+
+<app-toolbar [isDarkMode]="isDarkMode" (themeToggle)="toggleTheme()"></app-toolbar>
+<!-- Confirmation Dialog -->
+<div class="admin-dashboard" [class.dark-theme]="isDarkMode">
+  <div class="dashboard-header">
+    <h1>Admin Dashboard</h1>
+    <button class="refresh-btn" (click)="refreshDashboard()" [disabled]="isLoading">
+      <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i>
+      Refresh
+    </button>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Loading dashboard data...</p>
+    </div>
+  } @else if (errorMessage) {
+    <div class="error-state">
+      <i class="fas fa-exclamation-circle"></i>
+      <p>{{ errorMessage }}</p>
+      <button class="btn btn-primary" (click)="refreshDashboard()">Try Again</button>
+    </div>
+  } @else {
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <i class="fas fa-calendar-alt"></i>
+        <div class="stat-content">
+          <h3>Total Events</h3>
+          <p class="stat-number">{{ statistics.totalEvents }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-ticket-alt"></i>
+        <div class="stat-content">
+          <h3>Total Bookings</h3>
+          <p class="stat-number">{{ statistics.totalBookings }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-users"></i>
+        <div class="stat-content">
+          <h3>Total Users</h3>
+          <p class="stat-number">{{ statistics.totalUsers }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-dollar-sign"></i>
+        <div class="stat-content">
+          <h3>Total Revenue</h3>
+          <p class="stat-number">{{ statistics.totalRevenue | currency }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h2>Quick Actions</h2>
+      <div class="actions-grid">
+        <button class="action-btn" (click)="openEventModal()">
+          <i class="fas fa-plus"></i>
+          Create Event
+        </button>
+        <button class="action-btn" routerLink="/admin/bookings">
+          <i class="fas fa-ticket-alt"></i>
+          View Bookings
+        </button>
+        <button class="action-btn" routerLink="/admin/users">
+          <i class="fas fa-users"></i>
+          Manage Users
+        </button>
+        <button class="action-btn" routerLink="/admin/reports">
+          <i class="fas fa-chart-bar"></i>
+          View Reports
+        </button>
+      </div>
+    </div>
+
+    <!-- Recent Bookings -->
+    <div class="recent-bookings">
+      <div class="section-header">
+        <h2>Recent Bookings</h2>
+        <button class="btn btn-primary" routerLink="/admin/bookings">
+          View All
+        </button>
+      </div>
+      <div class="bookings-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Booking ID</th>
+              <th>Event</th>
+              <th>User</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (booking of statistics.recentBookings; track booking.id) {
+              <tr>
+                <td>{{ booking.id }}</td>
+                <td>{{ booking.event?.title || 'N/A' }}</td>
+                <td>{{ booking.user?.firstName || 'N/A' }} {{ booking.user?.lastName || 'N/A' }}</td>
+                <td>{{ booking.bookingDate | date:'mediumDate' }}</td>
+                <td>
+                  <span class="status-badge" [class]="booking.status.toLowerCase()">
+                    {{ booking.status }}
+                  </span>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button *ngIf="booking.status === 'Pending'"
+                            class="btn btn-success btn-sm"
+                            (click)="confirmBooking(booking.id)">
+                      Confirm
+                    </button>
+                    <button *ngIf="booking.status !== 'Cancelled'"
+                            class="btn btn-danger btn-sm"
+                            (click)="cancelBooking(booking.id)">
+                      Cancel
+                    </button>
+                    <button class="btn btn-primary btn-sm"
+                            (click)="viewBookingDetails(booking.id)">
+                      View
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Upcoming Events -->
+    <div class="upcoming-events">
+      <div class="section-header">
+        <h2>Upcoming Events</h2>
+        <div class="header-actions">
+          <button class="btn btn-primary" routerLink="/events">
+            View All
+          </button>
+        </div>
+      </div>
+      <div class="events-grid">
+        <div class="event-card" *ngFor="let event of statistics.upcomingEvents">
+          <img [src]="event.imageUrl" [alt]="event.title">
+          <div class="event-content">
+            <h3>{{event.title}}</h3>
+            <p><i class="fas fa-calendar"></i> {{event.startDate | date:'medium'}}</p>
+            <p><i class="fas fa-map-marker-alt"></i> {{event.venue}}</p>
+            <p><i class="fas fa-tag"></i> ${{event.price}}</p>
+            <div class="event-actions">
+              <button class="btn btn-sm" (click)="openEditModal(event)">
+                <i class="fas fa-edit"></i> Edit
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="deleteEvent(event.id)">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+<app-event-form-modal
+  [isOpen]="showEventModal"
+  [isDarkMode]="isDarkMode"
+  (close)="closeEventModal()"
+  (eventCreated)="onEventCreated()"
+></app-event-form-modal>
+
+<app-event-edit-modal
+  [isOpen]="showEditModal"
+  [event]="selectedEvent"
+  [isDarkMode]="isDarkMode"
+  (close)="closeEditModal()"
+  (eventUpdated)="onEventUpdated()"
+></app-event-edit-modal> 

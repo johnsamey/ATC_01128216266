@@ -1,0 +1,310 @@
+<app-toolbar [isDarkMode]="isDarkMode" (themeToggle)="toggleTheme()"></app-toolbar>
+
+<div class="bookings-container" [class.dark-theme]="isDarkMode">
+  <div class="bookings-header">
+    <h1>My Bookings</h1>
+    <div class="header-actions">
+      <button class="btn btn-primary" routerLink="/events">
+        <i class="fas fa-plus"></i> Book New Event
+      </button>
+      <!-- <button class="btn btn-outline" (click)="toggleView()">
+        <i class="fas" [class.fa-calendar]="!isCalendarView" [class.fa-list]="isCalendarView"></i>
+        {{ isCalendarView ? 'List View' : 'Calendar View' }}
+      </button> -->
+    </div>
+  </div>
+
+  <!-- Statistics Section -->
+  <div class="statistics-section">
+    <div class="stat-card">
+      <i class="fas fa-ticket-alt"></i>
+      <div class="stat-info">
+        <span class="stat-value">{{ totalBookings }}</span>
+        <span class="stat-label">Total Bookings</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <i class="fas fa-dollar-sign"></i>
+      <div class="stat-info">
+        <span class="stat-value">${{ totalSpent.toFixed(2) }}</span>
+        <span class="stat-label">Total Spent</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <i class="fas fa-calendar-check"></i>
+      <div class="stat-info">
+        <span class="stat-value">{{ upcomingEvents }}</span>
+        <span class="stat-label">Upcoming Events</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <i class="fas fa-history"></i>
+      <div class="stat-info">
+        <span class="stat-value">{{ pastEvents }}</span>
+        <span class="stat-label">Past Events</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Breakdown -->
+  <div class="status-breakdown">
+    <div class="status-item pending">
+      <span class="status-count">{{ statusCounts.pending }}</span>
+      <span class="status-label">Pending</span>
+    </div>
+    <div class="status-item confirmed">
+      <span class="status-count">{{ statusCounts.confirmed }}</span>
+      <span class="status-label">Confirmed</span>
+    </div>
+    <div class="status-item cancelled">
+      <span class="status-count">{{ statusCounts.cancelled }}</span>
+      <span class="status-label">Cancelled</span>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" 
+             [(ngModel)]="searchQuery" 
+             (input)="applyFilters()"
+             placeholder="Search by event name...">
+    </div>
+    
+    <div class="filter-group">
+      <select [(ngModel)]="statusFilter" (change)="applyFilters()">
+        <option value="">All Statuses</option>
+        <option value="Pending">Pending</option>
+        <option value="Confirmed">Confirmed</option>
+        <option value="Cancelled">Cancelled</option>
+      </select>
+
+      <select [(ngModel)]="categoryFilter" (change)="applyFilters()">
+        <option value="">All Categories</option>
+        <option *ngFor="let category of categories" [value]="category.id">
+          {{ category.name }}
+        </option>
+      </select>
+
+      <select [(ngModel)]="sortBy" (change)="applyFilters()">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Calendar View -->
+  <div *ngIf="isCalendarView" class="calendar-view">
+    <div class="calendar-header">
+      <button class="btn btn-icon" (click)="previousMonth()">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <h2>{{ currentMonth | date:'MMMM yyyy' }}</h2>
+      <button class="btn btn-icon" (click)="nextMonth()">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <div class="calendar-weekdays">
+      <div *ngFor="let day of weekDays" class="weekday">{{ day }}</div>
+    </div>
+
+    <div class="calendar-days">
+      <div *ngFor="let date of calendarDays" 
+           class="calendar-day"
+           [class.today]="isCurrentDay(date)"
+           [class.has-events]="hasEventsOnDay(date)"
+           [class.other-month]="!isDayInCurrentMonth(date)"
+           (click)="getEventsForDay(date).length > 0 && showDayEvents(date)">
+        {{ date | date:'d' }}
+      </div>
+    </div>
+  </div>
+
+  <!-- List View -->
+  <div class="filters-section">
+  <div *ngIf="!isCalendarView" class="bookings-list">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>Loading your bookings...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="errorMessage" class="error-container">
+      <div class="error-icon">
+        <i class="fas fa-exclamation-circle"></i>
+      </div>
+      <h2>Error</h2>
+      <p>{{ errorMessage }}</p>
+      <button class="btn btn-primary" (click)="loadBookings()">
+        <i class="fas fa-sync-alt"></i> Try Again
+      </button>
+    </div>
+
+    <!-- No Bookings State -->
+    <div *ngIf="!isLoading && !errorMessage && (!bookings || bookings.length === 0)" class="no-bookings">
+      <div class="empty-icon">
+        <i class="fas fa-calendar-times"></i>
+      </div>
+      <h2>No Bookings Yet</h2>
+      <p>You haven't made any bookings yet. Start exploring events!</p>
+      <button class="btn btn-primary" routerLink="/events">
+        <i class="fas fa-search"></i> Browse Events
+      </button>
+    </div>
+
+    <!-- Bookings List -->
+    <div *ngIf="!isLoading && !errorMessage && bookings && bookings.length > 0" class="bookings-list">
+      <div *ngFor="let booking of bookings" class="booking-card" [class]="booking.status.toLowerCase()">
+        <div class="booking-header">
+          <div class="event-title">
+            <h3>{{ booking.event?.title || 'Loading event details...' }}</h3>
+            <span class="status-badge" [class]="booking.status.toLowerCase()">
+              {{ booking.status }}
+            </span>
+          </div>
+          <div class="booking-date">
+            <i class="fas fa-calendar-alt"></i>
+            <span>{{ booking.bookingDate | date:'mediumDate' }}</span>
+          </div>
+        </div>
+
+        <div class="booking-content">
+          <div class="event-image" *ngIf="booking.event?.imageUrl">
+            <img [src]=getEventImage(booking.event?.imageUrl) [alt]="booking.event?.title">
+          </div>
+          
+          <div class="booking-details">
+            <div class="detail-group">
+              <div class="detail-item">
+                <i class="fas fa-ticket-alt"></i>
+                <div class="detail-info">
+                  <span class="label">Tickets</span>
+                  <span class="value">{{ booking.numberOfTickets }}</span>
+                </div>
+              </div>
+              <div class="detail-item">
+                <i class="fas fa-dollar-sign"></i>
+                <div class="detail-info">
+                  <span class="label">Total Price</span>
+                  <span class="value">${{ booking.totalPrice.toFixed(2) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-group" *ngIf="booking.event">
+              <div class="detail-item" *ngIf="booking.event?.venue">
+                <i class="fas fa-map-marker-alt"></i>
+                <div class="detail-info">
+                  <span class="label">Venue</span>
+                  <span class="value">{{ booking.event.venue }}</span>
+                </div>
+              </div>
+              <div class="detail-item" *ngIf="booking.event?.startDate">
+                <i class="fas fa-clock"></i>
+                <div class="detail-info">
+                  <span class="label">Event Date</span>
+                  <span class="value">{{ booking.event.startDate | date:'mediumDate' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-group" *ngIf="booking.event?.description">
+              <div class="detail-item description">
+                <i class="fas fa-info-circle"></i>
+                <div class="detail-info">
+                  <span class="label">Description</span>
+                  <span class="value">{{ booking.event?.description | slice:0:100 }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="booking-actions">
+          <button *ngIf="booking.status === 'Pending'" 
+                  class="btn btn-success" 
+                  (click)="openConfirmDialog(booking)">
+            <i class="fas fa-check"></i> Confirm Booking
+          </button>
+          <button *ngIf="booking.status === 'Pending'" 
+                  class="btn btn-danger" 
+                  (click)="openCancelDialog(booking)">
+            <i class="fas fa-times"></i> Cancel Booking
+          </button>
+          <button *ngIf="booking.status === 'Confirmed'" 
+                  class="btn btn-primary" 
+                  (click)="viewBookingDetails(booking.id)">
+            <i class="fas fa-eye"></i> View Details
+          </button>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div *ngIf="totalPages > 1" class="pagination">
+        <button [disabled]="currentPage === 1" 
+                (click)="changePage(currentPage - 1)" 
+                class="btn btn-outline">
+          <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
+        <button [disabled]="currentPage === totalPages" 
+                (click)="changePage(currentPage + 1)" 
+                class="btn btn-outline">
+          Next <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Booking Success Window -->
+    <div *ngIf="bookingSuccess" class="booking-success-window">
+      <div class="booking-success">
+        <div class="success-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h2>Booking Confirmed!</h2>
+        <div class="success-details">
+          <p>Your booking has been successfully confirmed.</p>
+          <p>Booking Reference: <strong>{{ bookingReference }}</strong></p>
+          <p class="success-message">We've sent a confirmation email with all the details.</p>
+        </div>
+        <div class="success-actions">
+          <button class="btn btn-primary" (click)="viewBookings()">
+            <i class="fas fa-ticket-alt"></i>
+            View My Bookings
+          </button>
+          <button class="btn btn-outline" (click)="returnToEvents()">
+            <i class="fas fa-arrow-left"></i>
+            Return to Events
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Confirmation Dialogs -->
+<app-confirmation-dialog
+  [isOpen]="showConfirmDialog"
+  [title]="dialogTitle"
+  [message]="dialogMessage"
+  [confirmText]="dialogConfirmText"
+  [confirmButtonClass]="dialogConfirmClass"
+  [isDarkMode]="isDarkMode"
+  (confirm)="onConfirmAction()"
+  (cancel)="onCancelAction()">
+</app-confirmation-dialog>
+
+<app-confirmation-dialog
+  [isOpen]="showCancelDialog"
+  [title]="dialogTitle"
+  [message]="dialogMessage"
+  [confirmText]="dialogConfirmText"
+  [confirmButtonClass]="dialogConfirmClass"
+  [isDarkMode]="isDarkMode"
+  (confirm)="onConfirmAction()"
+  (cancel)="onCancelAction()">
+</app-confirmation-dialog> 

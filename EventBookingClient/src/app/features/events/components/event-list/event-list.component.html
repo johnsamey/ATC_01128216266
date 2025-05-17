@@ -1,0 +1,204 @@
+<app-toolbar [isDarkMode]="isDarkMode" (themeToggle)="toggleTheme()"></app-toolbar>
+
+<!-- Confirmation Dialog -->
+<app-confirmation-dialog
+  [isOpen]="showConfirmDialog"
+  [title]="dialogTitle"
+  [message]="dialogMessage"
+  [confirmText]="dialogConfirmText"
+  [confirmButtonClass]="dialogConfirmClass"
+  [isDarkMode]="isDarkMode"
+  (confirm)="onConfirmAction()"
+  (cancel)="onCancelAction()">
+</app-confirmation-dialog>
+
+<div class="events-container" [class.dark-theme]="isDarkMode">
+  <div class="events-header">
+    <h1>Upcoming Events</h1>
+    <div class="header-actions">
+      <button *ngIf="isAdmin" class="btn btn-primary" (click)="openEventModal()">
+        <i class="fas fa-plus"></i> Create Event
+      </button>
+      <div class="search-wrapper">
+        <div class="search-container">
+          <div class="search-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Search events by title or description..." 
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearch($event)"
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="filters-section">
+    <div class="filters">
+      <select 
+        class="filter-select" 
+        [(ngModel)]="priceFilter"
+        (ngModelChange)="onPriceFilterChange($event)"
+      >
+        <option value="">All Prices</option>
+        <option value="under50">Under $50</option>
+        <option value="under100">Under $100</option>
+        <option value="under200">Under $200</option>
+        <option value="over200">Over $200</option>
+      </select>
+
+      <select 
+        class="filter-select" 
+        [(ngModel)]="locationFilter"
+        (ngModelChange)="onLocationFilterChange($event)"
+      >
+        <option value="">All Locations</option>
+        <option *ngFor="let location of locations" [value]="location">
+          {{location}}
+        </option>
+      </select>
+
+      <select 
+        class="filter-select" 
+        [(ngModel)]="dateFilter"
+        (ngModelChange)="onDateFilterChange($event)"
+      >
+        <option value="">All Dates</option>
+        <option value="today">Today</option>
+        <option value="thisWeek">This Week</option>
+        <option value="thisMonth">This Month</option>
+        <option value="nextMonth">Next Month</option>
+      </select>
+
+      <select 
+        class="filter-select" 
+        [(ngModel)]="selectedCategoryId"
+        (ngModelChange)="onCategoryChange($event)"
+      >
+        <option [ngValue]="undefined">All Categories</option>
+        <option *ngFor="let category of categories" [value]="category.id">
+          {{category.name}}
+        </option>
+      </select>
+
+      <button class="reset-button" (click)="resetFilters()">
+        Reset Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Loading events...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-container">
+    <i class="fas fa-exclamation-circle"></i>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Events Grid -->
+  <div *ngIf="!loading && !error" class="events-grid">
+    @for (event of events; track event.id) {
+      <div class="event-card">
+        <div class="event-image-container">
+          <img 
+            [src]="getEventImage(event.imageUrl)" 
+            [alt]="event.title" 
+            class="event-image">
+        </div>
+        <div class="event-content">
+          <div class="event-info">
+            <h2>{{ event.title }}</h2>
+            <p class="event-date">
+              <i class="fas fa-calendar"></i>
+              {{ event.startDate | date:'mediumDate' }}
+            </p>
+            <p class="event-location">
+              <i class="fas fa-map-marker-alt"></i>
+              {{ event.venue }}
+            </p>
+            <p class="event-description">{{ event.description | slice:0:100 }}...</p>
+          </div>
+          
+          <div class="event-footer">
+            <div class="event-price">
+              {{ event.price | currency }}
+            </div>
+            <div class="event-actions">
+              <a [routerLink]="['/events', event.id]" class="btn btn-primary">
+                View Details
+              </a>
+              @if (isAdmin) {
+                <button class="btn btn-sm" (click)="openEditModal(event)">
+                  <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="deleteEvent(event.id)">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- No Events State -->
+  <div *ngIf="!loading && !error && events.length === 0" class="no-events">
+    <i class="fas fa-calendar-times"></i>
+    <p>No events found</p>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!loading && !error && totalPages > 1" class="pagination">
+    <button 
+      class="pagination-btn" 
+      [disabled]="currentPage === 1"
+      (click)="onPageChange(currentPage - 1)"
+    >
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    
+    @for (page of [].constructor(totalPages); track $index) {
+      <button 
+        class="pagination-btn" 
+        [class.active]="currentPage === $index + 1"
+        (click)="onPageChange($index + 1)"
+      >
+        {{ $index + 1 }}
+      </button>
+    }
+    
+    <button 
+      class="pagination-btn" 
+      [disabled]="currentPage === totalPages"
+      (click)="onPageChange(currentPage + 1)"
+    >
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+</div>
+
+<app-event-form-modal
+  [isOpen]="showEventModal"
+  [isDarkMode]="isDarkMode"
+  (close)="closeEventModal()"
+  (eventCreated)="onEventCreated()"
+></app-event-form-modal>
+
+<app-event-edit-modal
+  [isOpen]="showEditModal"
+  [event]="selectedEvent"
+  [isDarkMode]="isDarkMode"
+  (close)="closeEditModal()"
+  (eventUpdated)="onEventUpdated()"
+></app-event-edit-modal>

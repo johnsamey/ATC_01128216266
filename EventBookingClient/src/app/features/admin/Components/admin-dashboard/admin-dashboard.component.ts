@@ -36,7 +36,7 @@ export class AdminDashboardComponent implements OnInit {
   showEventModal = false;
   showEditModal = false;
   selectedEvent: Event | null = null;
-
+  defaultImageUrl = 'assets/uploads/default-event.jpg';
 
   showConfirmDialog = false;
   showCancelDialog = false;
@@ -124,6 +124,16 @@ export class AdminDashboardComponent implements OnInit {
   editEvent(eventId: number): void {
     // TODO: Implement edit event functionality
     console.log('Edit event:', eventId);
+  }
+
+  getEventImage(imageUrl: string | null): string {
+    if (!imageUrl) {
+      return this.defaultImageUrl;
+    }
+    if (imageUrl.startsWith('/event-images/')) {
+      return imageUrl;
+    }
+    return `/event-images/${imageUrl}`;
   }
 
   deleteEvent(eventId: number): void {

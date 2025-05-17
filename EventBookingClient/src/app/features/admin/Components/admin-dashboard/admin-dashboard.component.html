@@ -168,7 +168,7 @@
       </div>
       <div class="events-grid">
         <div class="event-card" *ngFor="let event of statistics.upcomingEvents">
-          <img [src]="event.imageUrl" [alt]="event.title">
+          <img [src]="getEventImage(event.imageUrl)" [alt]="event.title">
           <div class="event-content">
             <h3>{{event.title}}</h3>
             <p><i class="fas fa-calendar"></i> {{event.startDate | date:'medium'}}</p>

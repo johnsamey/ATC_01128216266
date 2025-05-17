@@ -329,6 +329,55 @@
   flex-wrap: wrap;
 }
 
+.admin-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-edit {
+  background-color: #f6c343;
+  color: #333;
+  border: none;
+  box-shadow: 0 2px 4px rgba(246, 195, 67, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.btn-edit:hover {
+  background-color: #ffd700;
+  color: #222;
+  box-shadow: 0 4px 8px rgba(246, 195, 67, 0.25);
+}
+
+.btn-delete {
+  background-color: var(--error-color);
+  color: #fff;
+  border: none;
+  box-shadow: 0 2px 4px rgba(231, 76, 60, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.btn-delete:hover {
+  background-color: #c82333;
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(231, 76, 60, 0.25);
+}
+
+.btn-edit i, .btn-delete i {
+  font-size: 1rem;
+}
+
 .btn {
   padding: 0.5rem 1rem;
   border: none;
@@ -421,6 +470,16 @@
   .btn {
     width: 100%;
   }
+
+  .admin-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+  }
+  .btn-edit, .btn-delete {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .no-events {
@@ -492,5 +551,60 @@
 
   .events-header h1 {
     font-size: 2rem;
+  }
+}
+
+.event-actions.column-layout {
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.btn-fullwidth {
+  width: 100%;
+  justify-content: center;
+  display: flex;
+}
+
+.admin-actions.row-layout {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  width: 100%;
+}
+
+.btn-halfwidth {
+  width: 50%;
+  border-radius: 0 0 0.5rem 0.5rem;
+  justify-content: center;
+  display: flex;
+  border-top: 1px solid var(--border-color);
+}
+
+.btn-halfwidth:first-child {
+  border-right: 1px solid var(--border-color);
+  border-radius: 0 0 0 0.5rem;
+}
+
+.btn-halfwidth:last-child {
+  border-radius: 0 0 0.5rem 0;
+}
+
+@media (max-width: 480px) {
+  .admin-actions.row-layout {
+    flex-direction: column;
+  }
+  .btn-halfwidth {
+    width: 100%;
+    border-radius: 0 0 0.5rem 0.5rem;
+    border-right: none;
+    border-top: 1px solid var(--border-color);
+  }
+  .btn-halfwidth:first-child {
+    border-radius: 0 0 0.5rem 0.5rem;
+    border-right: none;
+  }
+  .btn-halfwidth:last-child {
+    border-radius: 0 0 0.5rem 0.5rem;
   }
 } 

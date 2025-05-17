@@ -134,17 +134,22 @@
             <div class="event-price">
               {{ event.price | currency }}
             </div>
-            <div class="event-actions">
-              <a [routerLink]="['/events', event.id]" class="btn btn-primary">
+            <div class="event-actions column-layout">
+              <a [routerLink]="['/events', event.id]" class="btn btn-primary btn-fullwidth">
+                <i class="fas fa-eye"></i>
                 View Details
               </a>
               @if (isAdmin) {
-                <button class="btn btn-sm" (click)="openEditModal(event)">
-                  <i class="fas fa-edit"></i> Edit
-                </button>
-                <button class="btn btn-sm btn-danger" (click)="deleteEvent(event.id)">
-                  <i class="fas fa-trash"></i> Delete
-                </button>
+                <div class="admin-actions row-layout">
+                  <button class="btn btn-edit btn-halfwidth" (click)="openEditModal(event)" title="Edit Event">
+                    <i class="fas fa-edit"></i>
+                    <span>Edit</span>
+                  </button>
+                  <button class="btn btn-delete btn-halfwidth" (click)="deleteEvent(event.id)" title="Delete Event">
+                    <i class="fas fa-trash"></i>
+                    <span>Delete</span>
+                  </button>
+                </div>
               }
             </div>
           </div>

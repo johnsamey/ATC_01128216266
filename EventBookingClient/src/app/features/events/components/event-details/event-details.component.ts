@@ -86,8 +86,18 @@ export class EventDetailsComponent implements OnInit {
     return this.authService.isAuthenticated();
   }
 
-  getEventImage(imageUrl: string): string {
-    return imageUrl || this.defaultImageUrl;
+  // getEventImage(imageUrl: string): string {
+  //   return imageUrl || this.defaultImageUrl;
+  // }
+
+  getEventImage(imageUrl: string | null): string {
+    if (!imageUrl) {
+      return this.defaultImageUrl;
+    }
+    if (imageUrl.startsWith('/event-images/')) {
+      return imageUrl;
+    }
+    return `/event-images/${imageUrl}`;
   }
 
   toggleTheme(): void {

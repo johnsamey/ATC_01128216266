@@ -30,6 +30,21 @@ A modern web application for managing event bookings, built with Angular and .NE
 - FluentValidation
 - AutoMapper
 
+## Deployment
+
+The application is currently deployed on AWS EC2 with the following configuration:
+- Web Server: Nginx
+- Live URL: [https://eventbooking.ddns.net/events](https://eventbooking.ddns.net/events)
+
+### Performance Considerations
+The current deployment has some performance limitations due to:
+- Server location being far from target users
+- Multiple processes/websites running on the same instance
+- Limited server specifications
+
+These factors may result in slower response times
+
+
 ## Prerequisites
 
 - Node.js (v18 or higher)

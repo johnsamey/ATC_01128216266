@@ -19,28 +19,29 @@
       <button *ngIf="isAdmin" class="btn btn-primary" (click)="openEventModal()">
         <i class="fas fa-plus"></i> Create Event
       </button>
-      <div class="search-wrapper">
-        <div class="search-container">
-          <div class="search-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-          </div>
-          <input 
-            type="text" 
-            class="search-input" 
-            placeholder="Search events by title or description..." 
-            [(ngModel)]="searchTerm"
-            (ngModelChange)="onSearch($event)"
-          >
-        </div>
-      </div>
     </div>
   </div>
 
   <div class="filters-section">
-    <div class="filters">
+    <div class="search-row">
+      <div class="search-container">
+        <div class="search-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </div>
+        <input 
+          type="text" 
+          class="search-input" 
+          placeholder="Search events by title or description..." 
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearch($event)"
+        >
+      </div>
+    </div>
+
+    <div class="filters-row">
       <select 
         class="filter-select" 
         [(ngModel)]="priceFilter"

@@ -15,7 +15,7 @@ This project is the backend for the Event Booking System, built with .NET Core 8
 1. Clone the repository:
    ```bash
    git clone <repository-url>
-   cd Backend
+   cd EvenBookingSystem/EventBookingAPI
    ```
 
 2. Install dependencies:
@@ -32,7 +32,7 @@ This project is the backend for the Event Booking System, built with .NET Core 8
    }
    ```
 
-4. If you are running the frontend and backend on different domain you should handl CORS in `EventBooking.API/Program.cs`
+4. If you are running the frontend and backend on different domains, you should handle CORS in `EventBooking.API/Program.cs`
 
 5. Run database migrations:
    ```bash
@@ -40,28 +40,23 @@ This project is the backend for the Event Booking System, built with .NET Core 8
    dotnet ef database update
    ```
 
-4. Start the backend server:
+6. Start the backend server:
    ```bash
    dotnet run
    ```
 
    The API will be available at `https://localhost:Port`.
 
-### Docker Setup
-
-1. Build and run the backend container using Docker Compose:
-   ```bash
-   docker-compose up web
-   ```
-
-   The API will be available at `http://localhost:80`.
 
 ## Project Structure
 
-- `EventBooking.API`: API Layer
-- `EventBooking.Application`: Application Layer
-- `EventBooking.Domain`: Domain Layer
-- `EventBooking.Infrastructure`: Infrastructure Layer
+```
+EventBookingAPI/
+├── EventBooking.API/           # API Layer
+├── EventBooking.Application/   # Application Layer
+├── EventBooking.Domain/        # Domain Layer
+└── EventBooking.Infrastructure/# Infrastructure Layer
+```
 
 ## Scripts
 

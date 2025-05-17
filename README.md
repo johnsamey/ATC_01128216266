@@ -43,23 +43,23 @@ A modern web application for managing event bookings, built with Angular and .NE
 
 ```bash
 git clone <repository-url>
-cd event-booking-system
+cd EvenBookingSystem
 ```
 
 ### 2. Backend Setup
 
-For detailed backend setup instructions, refer to the [Backend README](Backend/README.md).
+For detailed backend setup instructions, refer to the [Backend README](EventBookingAPI/README.md).
 
 ### 3. Frontend Setup
 
-For detailed frontend setup instructions, refer to the [Frontend README](Frontend/README.md).
+For detailed frontend setup instructions, refer to the [Frontend README](EventBookingClient/README.md).
 
 ### 4. Collaborating Frontend and Backend
 
 1. **Start the Backend Server**:
-   - Navigate to the backend directory:
+   - After complete backend setup:
      ```bash
-     cd Backend
+     cd EventBookingAPI
      ```
    - Start the backend server:
      ```bash
@@ -68,13 +68,12 @@ For detailed frontend setup instructions, refer to the [Frontend README](Fronten
    - The API will be available at `https://localhost:Port`.
 
 2. **Start the Frontend Server**:
-   - Navigate to the frontend directory:
+   - After complete frontend setup:
      ```bash
-     cd Frontend
+     cd EventBookingClient
      ```
    - Start the frontend development server:
      ```bash
-     cd event-booking-client
      ng serve
      ```
    - The application will be available at `http://localhost:4200`.
@@ -85,15 +84,17 @@ For detailed frontend setup instructions, refer to the [Frontend README](Fronten
 ## Project Structure
 
 ```
-event-booking-system/
-├── Backend/                    # Backend .NET Core project
+EvenBookingSystem/
+├── EventBookingAPI/           # Backend .NET Core project
 │   ├── EventBooking.API/      # API Layer
 │   ├── EventBooking.Application/ # Application Layer
 │   ├── EventBooking.Domain/   # Domain Layer
 │   └── EventBooking.Infrastructure/ # Infrastructure Layer
 │
-└── Frontend/                  # Frontend Angular project
-    └── event-booking-client/  # Angular application
+└── EventBookingClient/        # Frontend Angular project
+    ├── src/                   # Source code
+    ├── public/               # Static files
+    └── ...                   # Configuration files
 ```
 
 ## Scripts

@@ -75,14 +75,4 @@ public class AuthController(IAuthService authService,UserManager<ApplicationUser
             }
         });
     }
-    // [HttpGet("seed-admin")]
-    // public async Task<IActionResult> SeedAdmin()
-    // {
-    //     var response = await authService.SeedAdminAsync();
-    //     
-    //     if (!response.Success)
-    //         return BadRequest(response);
-    //         
-    //     return Ok(response);
-    // }
 }
